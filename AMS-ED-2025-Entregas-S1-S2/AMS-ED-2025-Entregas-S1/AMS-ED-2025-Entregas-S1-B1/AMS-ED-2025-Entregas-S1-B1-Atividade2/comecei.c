@@ -113,3 +113,82 @@ int main() {
 
     return 0;
 }
+
+
+
+
+
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    char nome[30];
+    float *PE;
+    float *AC;
+    float *PP;
+    float *EB;
+} Candidato;
+
+void receberNome(Candidato *candidato) {
+    printf("Digite o nome: ");
+    scanf("%s", candidato->nome); 
+}
+
+
+void receberNotas(float **notas, int quantidade, const char *tipo) {
+    *notas = (float *)malloc(quantidade * sizeof(float));
+    if (*notas == NULL) {
+        printf("Erro ao alocar memória para as notas de %s.\n", tipo);
+        exit(1);
+    }
+    printf("Digite as %d notas para %s:\n", quantidade, tipo);
+    for (int i = 0; i < quantidade; i++) {
+        do {
+            printf("Nota %d: ", i + 1);
+            scanf("%f", &(*notas)[i]);
+            if ((*notas)[i] < 0 || (*notas)[i] > 10) {
+                printf("Nota inválida. A nota deve ser entre 0 e 10.\n");
+            }
+        } while ((*notas)[i] < 0 || (*notas)[i] > 10); 
+    }
+}
+
+
+
+int main() {
+    Candidato candidatos[2];
+
+    for (int i = 0; i < 2; i++) {
+        printf("\n--- Candidato %d ---\n", i + 1);
+        receberNome(&candidatos[i]);
+        receberNotas(&candidatos[i].PE, 4, "Prova Escrita (PE)");
+        receberNotas(&candidatos[i].AC, 5, "Análise Curricular (AC)");
+        receberNotas(&candidatos[i].PP, 10, "Prova Prática (PP)");
+        receberNotas(&candidatos[i].EB, 3, "Entrevista em Banca (EB)");
+    }
+
+    for (int i = 0; i < 2; i++) {
+        printf("\nCandidato: %s\n", candidatos[i].nome);
+        printf("Notas PE: ");
+        for (int j = 0; j < 4; j++) printf("%.1f ", candidatos[i].PE[j]);
+
+        printf("\nNotas AC: ");
+        for (int j = 0; j < 5; j++) printf("%.1f ", candidatos[i].AC[j]);
+
+        printf("\nNotas PP: ");
+        for (int j = 0; j < 10; j++) printf("%.1f ", candidatos[i].PP[j]);
+
+        printf("\nNotas EB: ");
+        for (int j = 0; j < 3; j++) printf("%.1f ", candidatos[i].EB[j]);
+
+        free(candidatos[i].PE);
+        free(candidatos[i].AC);
+        free(candidatos[i].PP);
+        free(candidatos[i].EB);
+    }
+
+    return 0;
+}
