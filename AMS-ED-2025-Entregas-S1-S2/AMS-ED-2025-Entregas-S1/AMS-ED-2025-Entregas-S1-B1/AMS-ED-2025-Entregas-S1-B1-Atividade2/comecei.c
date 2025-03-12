@@ -1,28 +1,41 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-typedef struct{
-    char nome[100];
-    float PE[4];
-    float AC[5];
-    float PP[10];
-    float EB[3];
-    float NotaFinal;
-}candidato;
+typedef struct {
+    char nome[30];
+    float *PE;
+    float *AC;
+    float *PP;
+    float *EB;
+} Candidato;
 
-    
 void receberNome(Candidato *candidato) {
     printf("Digite o nome: ");
-    scanf("%99s", candidato->nome);
+    scanf("%s", candidato->nome); 
 }
 
-
-
+void receberNotas(float **notas, int quantidade, const char *tipo) {
+    *notas = (float *)malloc(quantidade * sizeof(float));
+    if (*notas == NULL) {
+        printf("Erro ao alocar memória para as notas de %s.\n", tipo);
+        exit(1);
+    }
+    printf("Digite as %d notas para %s:\n", quantidade, tipo);
+    for (int i = 0; i < quantidade; i++) {
+        do {
+            printf("Nota %d: ", i + 1);
+            scanf("%f", &(*notas)[i]);
+            if ((*notas)[i] < 0 || (*notas)[i] > 10) {
+                printf("Nota inválida. A nota deve ser entre 0 e 10.\n");
+            }
+        } while ((*notas)[i] < 0 || (*notas)[i] > 10); 
+    }
+}
 
 
 float somarNotasCentrais(float *notas, int *indice) {
     float maior = notas[0], menor = notas[0], soma = 0;
     int indiceMaior = 0, indiceMenor = 0;
-
 
     for (int i = 1; i < *indice; i++) {
         if (notas[i] > maior) {
@@ -35,7 +48,6 @@ float somarNotasCentrais(float *notas, int *indice) {
         }
     }
 
-    
     for (int i = 0; i < *indice; i++) {
         if (i != indiceMaior && i != indiceMenor) {
             soma += notas[i];
@@ -46,17 +58,58 @@ float somarNotasCentrais(float *notas, int *indice) {
 }
 
 int main() {
-    
-    
-    
-    
-    
-    
-    
-    float notas[] = {7.5, 8.0, 9.0, 6.0, 8.5};
-    int tamanho = sizeof(notas) / sizeof(notas[0]);
+    int numCandidatos;
 
-    printf("Soma das notas centrais: %.2f\n", somarNotasCentrais(notas, &tamanho));
+
+    do {
+        printf("Quantos candidatos vão ser avaliados? (Máximo 50): ");
+        scanf("%d", &numCandidatos);
+        if (numCandidatos <= 0 || numCandidatos > 50) {
+            printf("Por favor, insira um número de candidatos entre 1 e 50.\n");
+        }
+    } while (numCandidatos <= 0 || numCandidatos > 50);
+
+
+    Candidato *candidatos = (Candidato *)malloc(numCandidatos * sizeof(Candidato));
+    if (candidatos == NULL) {
+        printf("Erro ao alocar memória para os candidatos.\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < numCandidatos; i++) {
+        printf("\n--- Candidato %d ---\n", i + 1);
+        receberNome(&candidatos[i]);
+        receberNotas(&candidatos[i].PE, 4, "Prova Escrita (PE)");
+        receberNotas(&candidatos[i].AC, 5, "Análise Curricular (AC)");
+        receberNotas(&candidatos[i].PP, 10, "Prova Prática (PP)");
+        receberNotas(&candidatos[i].EB, 3, "Entrevista em Banca (EB)");
+    }
+
+
+    for (int i = 0; i < numCandidatos; i++) {
+        printf("\nCandidato: %s\n", candidatos[i].nome);
+
+        int tamanhoPE = 4, tamanhoAC = 5, tamanhoPP = 10, tamanhoEB = 3;
+
+        float somaPE = somarNotasCentrais(candidatos[i].PE, &tamanhoPE);
+        float somaAC = somarNotasCentrais(candidatos[i].AC, &tamanhoAC);
+        float somaPP = somarNotasCentrais(candidatos[i].PP, &tamanhoPP);
+        float somaEB = somarNotasCentrais(candidatos[i].EB, &tamanhoEB);
+
+
+        float NF = (somaPE * 0.3) + (somaAC * 0.1) + (somaPP * 0.4) + (somaEB * 0.2);
+
+        printf("Cálculo atribuído aos pesos da soma das notas centrais: %.2f\n", NF);
+
+  
+        free(candidatos[i].PE);
+        free(candidatos[i].AC);
+        free(candidatos[i].PP);
+        free(candidatos[i].EB);
+    }
+
+
+    free(candidatos);
 
     return 0;
 }
