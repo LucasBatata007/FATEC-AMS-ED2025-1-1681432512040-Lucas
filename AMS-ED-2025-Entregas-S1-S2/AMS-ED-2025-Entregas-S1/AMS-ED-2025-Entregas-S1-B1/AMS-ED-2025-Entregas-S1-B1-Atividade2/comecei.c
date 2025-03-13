@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     char nome[30];
@@ -7,6 +8,7 @@ typedef struct {
     float *AC;
     float *PP;
     float *EB;
+    float notaFinal; 
 } Candidato;
 
 void receberNome(Candidato *candidato) {
@@ -32,7 +34,6 @@ void receberNotas(float **notas, int quantidade, const char *tipo) {
     }
 }
 
-
 float somarNotasCentrais(float *notas, int *indice) {
     float maior = notas[0], menor = notas[0], soma = 0;
     int indiceMaior = 0, indiceMenor = 0;
@@ -57,9 +58,14 @@ float somarNotasCentrais(float *notas, int *indice) {
     return soma;
 }
 
+int compararNotas(const void *a, const void *b) {
+    float notaA = ((Candidato *)a)->notaFinal;
+    float notaB = ((Candidato *)b)->notaFinal;
+    return (notaB - notaA) > 0 ? 1 : -1; 
+}
+
 int main() {
     int numCandidatos;
-
 
     do {
         printf("Quantos candidatos vão ser avaliados? (Máximo 50): ");
@@ -68,7 +74,6 @@ int main() {
             printf("Por favor, insira um número de candidatos entre 1 e 50.\n");
         }
     } while (numCandidatos <= 0 || numCandidatos > 50);
-
 
     Candidato *candidatos = (Candidato *)malloc(numCandidatos * sizeof(Candidato));
     if (candidatos == NULL) {
@@ -83,31 +88,28 @@ int main() {
         receberNotas(&candidatos[i].AC, 5, "Análise Curricular (AC)");
         receberNotas(&candidatos[i].PP, 10, "Prova Prática (PP)");
         receberNotas(&candidatos[i].EB, 3, "Entrevista em Banca (EB)");
-    }
-
-
-    for (int i = 0; i < numCandidatos; i++) {
-        printf("\nCandidato: %s\n", candidatos[i].nome);
 
         int tamanhoPE = 4, tamanhoAC = 5, tamanhoPP = 10, tamanhoEB = 3;
-
         float somaPE = somarNotasCentrais(candidatos[i].PE, &tamanhoPE);
         float somaAC = somarNotasCentrais(candidatos[i].AC, &tamanhoAC);
         float somaPP = somarNotasCentrais(candidatos[i].PP, &tamanhoPP);
         float somaEB = somarNotasCentrais(candidatos[i].EB, &tamanhoEB);
 
+        candidatos[i].notaFinal = (somaPE * 0.3) + (somaAC * 0.1) + (somaPP * 0.4) + (somaEB * 0.2);
+    }
 
-        float NF = (somaPE * 0.3) + (somaAC * 0.1) + (somaPP * 0.4) + (somaEB * 0.2);
 
-        printf("Cálculo atribuído aos pesos da soma das notas centrais: %.2f\n", NF);
+    qsort(candidatos, numCandidatos, sizeof(Candidato), compararNotas);
 
-  
+    printf("\n--- Top 5 Melhores Candidatos ---\n");
+    for (int i = 0; i < (numCandidatos < 5 ? numCandidatos : 5); i++) {
+        printf("%dº lugar - %s: %.2f\n", i + 1, candidatos[i].nome, candidatos[i].notaFinal);
+
         free(candidatos[i].PE);
         free(candidatos[i].AC);
         free(candidatos[i].PP);
         free(candidatos[i].EB);
     }
-
 
     free(candidatos);
 
