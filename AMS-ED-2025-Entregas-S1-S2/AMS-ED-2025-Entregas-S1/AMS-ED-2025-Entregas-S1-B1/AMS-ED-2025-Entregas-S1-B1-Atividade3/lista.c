@@ -230,7 +230,7 @@ int main() {
             default:
                 printf("Opção inválida. Tente novamente.\n");
         }
-    } while (opcao != 5);
+    } while (opcao != 6);
 
     return 0;
 }
