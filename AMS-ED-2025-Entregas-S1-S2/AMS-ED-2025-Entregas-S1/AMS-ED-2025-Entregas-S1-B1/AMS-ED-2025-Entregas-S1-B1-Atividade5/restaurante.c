@@ -1,3 +1,12 @@
+/*----------------------------------------------------------------------------------*/
+/*   FATEC-São Caetano do Sul                 Estrutura de Dados                    */
+/*                         Id da Atividade: S1-B1 Atividade 5                       */
+/*             Objetivo: <<  Restaurante com pilha  >>                              */
+/*                                                                                  */
+/*                                  Autor: Lucas Batista                            */
+/*                                                                    Data:01/04/2025*/
+/*----------------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
