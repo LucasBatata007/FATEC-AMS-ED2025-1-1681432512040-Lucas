@@ -10,6 +10,8 @@ typedef struct {
     int topo;
 } Pilha;
 
+char amaz[1000];  
+
 Pilha* criar_pilha() {
     Pilha *p = (Pilha*) malloc(sizeof(Pilha));
     p->topo = -1;
@@ -18,7 +20,6 @@ Pilha* criar_pilha() {
     }
     return p;
 }
-
 
 void push(Pilha *p, float valor) {
     if (p->topo == MAX - 1) {
@@ -42,6 +43,14 @@ float topo(Pilha *p) {
         return 0;
     }
     return p->dados[p->topo];
+}
+
+int vazia(Pilha *p) {
+    return p->topo == -1;
+}
+
+int cheia(Pilha *p) {
+    return p->topo == MAX - 1;
 }
 
 void exibir_memoria(Pilha *p) {
@@ -80,29 +89,42 @@ int main() {
     printf("Modo de entrada: Digite números e operadores separadamente\n");
     printf("Digite 'q' para sair.\n");
 
+    amaz[0] = '\0';
+
     while (1) {
         printf("\nDigite um número ou operador (+, -, *, /): ");
         scanf("%s", entrada);
 
         if (entrada[0] == 'q') {
-            
-        free(p);
-         exibir_memoria(p);
             break;
         }
 
         if (isdigit(entrada[0])) {
-            push(p, atof(entrada));
+            float numero = atof(entrada);
+            push(p, numero);
+            char temp[50];
+            sprintf(temp, "%.2f", numero);
+            strcat(amaz, temp);
+            strcat(amaz, " ");  
             printf("Número adicionado à pilha.\n");
+
         } else if (entrada[0] == '+' || entrada[0] == '-' || 
                    entrada[0] == '*' || entrada[0] == '/') {
             realizar_operacao(p, entrada[0]);
+            char operador[2] = {entrada[0], '\0'};
+            strcat(amaz, operador);
+            strcat(amaz, " "); 
+
         } else {
             printf("Entrada inválida. Digite um número ou um operador válido.\n");
         }
-
-        exibir_memoria(p);
     }
 
+    exibir_memoria(p);
+    printf("Fórmula em notação reversa polonesa: %s\n", amaz);
+    
+    printf("Resultado final: %.2f\n", topo(p));
+
+    free(p);
     return 0;
 }
